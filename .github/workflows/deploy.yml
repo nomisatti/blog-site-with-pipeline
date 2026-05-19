@@ -1,72 +1,33 @@
-# name: Save File Artifact
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# jobs:
-#   create-file:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
-
-#       - name: Create a file
-#         run: |
-#           mkdir -p output
-#           echo "Hello from GitHub Actions" > output/message.txt
-#           echo "This file is stored as an artifact." >> output/message.txt
-
-#       - name: Upload artifact
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: my-artifact
-#           path: output/message.txt
-
-#   download-and-read:
-#     runs-on: ubuntu-latest
-#     needs: create-file
-
-#     steps:
-#       - name: Download artifact
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: my-artifact
-#           path: downloaded
-
-#       - name: Read artifact file
-#         run: |
-#           echo "Reading artifact content:"
-#           cat downloaded/message.txt
-name: docker compose deploy
+name: Delpoy to AWS and run docker compose
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
-  create-file:
-    runs-on: ubuntu-latest
+    deploy-on-aws:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Check Repository
+              uses: actions/checkout@v4
 
-      - name: Create file on EC2 using SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT }}
+            - name: Connect to AWS/SSH
+              uses: appleboy/ssh-actions@v1.0.3
 
-          script: |
-           cd /home/ubuntu/mern-app-batch-215
-           docker compose down
-            docker compose up -d --build
-            docker ps -a
-            docker logs frontend
+              with:
+                host: ${{secrets.AWS_HOST}}
+                username: ${{secrets.AWS_username}}
+                key: ${{secrets.AWS_key}}
+                port: ${{secrets.AWS_PORT}}
+
+            script: |
+                cd /home/ubuntu/devops_projects/blog-site-pipline     
+                sudo docker compose down
+                sudo docker compose up -d --build
+                sudo docker logs frontend
+            
+
+
+   
