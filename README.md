@@ -163,6 +163,3 @@ docker exec -it mongodb mongosh
 
 ---
 
-## License
-
-MIT
